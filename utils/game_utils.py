@@ -3,9 +3,9 @@ import pygame
 from pygame import Rect, Surface
 
 from .my_events import LEFT_HIT, RIGHT_HIT, WIN
-from .game_context import GameContext
-from .bullet import Bullet
-from .spaceship import Spaceship
+from .classes.game_context import GameContext
+from .classes.bullet import Bullet
+from .classes.spaceship import Spaceship
 from .config import (WHITE, WINDOW_WIDTH, WINDOW_HEIGHT, BARRIER_WIDTH, DISPLAY_NAME, BG_COLOR,
                      LEFT_INIT_X, LEFT_INIT_Y, RIGHT_INIT_X, RIGHT_INIT_Y, BULLET_VEL,
                      LEFT_SPACESHIP_FILE, RIGHT_SPACESHIP_FILE, MAX_ACTIVE_BULLETS, WIN_TEXT_DELAY)
@@ -35,7 +35,7 @@ def create_barrier() -> Rect:
     Returns:
         A Rect object that references to the created barrier.
     """
-    return pygame.Rect(int(WINDOW_WIDTH/2 - BARRIER_WIDTH/2), 0, BARRIER_WIDTH, WINDOW_HEIGHT)
+    return pygame.Rect(int(WINDOW_WIDTH / 2 - BARRIER_WIDTH / 2), 0, BARRIER_WIDTH, WINDOW_HEIGHT)
 
 
 def create_spaceships() -> tuple[Spaceship, Spaceship]:
@@ -194,8 +194,8 @@ def handle_win(context: GameContext, event: pygame.event.EventType) -> None:
         win_text = WINNER_FONT.render(f"{event.winner.name} wins", 1, WHITE)
         context.game_window.blit(
             win_text,
-            (context.game_window.get_width()//2 - win_text.get_width()//2,
-             context.game_window.get_height()//2 - win_text.get_height()//2)
+            (context.game_window.get_width() // 2 - win_text.get_width() // 2,
+             context.game_window.get_height() // 2 - win_text.get_height() // 2)
         )
         pygame.display.update()
         pygame.time.delay(WIN_TEXT_DELAY)  # Wait a bit in the winner screen

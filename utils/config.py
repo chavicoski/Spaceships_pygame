@@ -21,14 +21,16 @@ WINDOW_HEIGHT = 500
 
 BARRIER_WIDTH = WINDOW_WIDTH * 0.05
 
+# Note: The object created has width and height inverted respect to the axis
+#       because the original image of the spaceships are looking downwards.
 SPACESHIP_WIDTH = 55
 SPACESHIP_HEIGHT = 40
 
-LEFT_INIT_X = 300
-LEFT_INIT_Y = 100
+LEFT_INIT_X = int(WINDOW_WIDTH * 0.1)
+LEFT_INIT_Y = WINDOW_HEIGHT // 2 - SPACESHIP_WIDTH // 2
 
-RIGHT_INIT_X = 700
-RIGHT_INIT_Y = 100
+RIGHT_INIT_X = int(WINDOW_WIDTH * 0.9) - SPACESHIP_HEIGHT
+RIGHT_INIT_Y = WINDOW_HEIGHT // 2 - SPACESHIP_WIDTH // 2
 
 # CONTROLS
 LEFT_LEFT = pygame.K_a

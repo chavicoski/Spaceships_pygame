@@ -2,7 +2,7 @@ import os
 
 import pygame
 
-from .config import ASSETS_PATH, SPACESHIP_WIDTH, SPACESHIP_HEIGHT, INIT_HEALTH
+from ..config import ASSETS_PATH, SPACESHIP_WIDTH, SPACESHIP_HEIGHT, INIT_HEALTH
 
 
 class Spaceship:

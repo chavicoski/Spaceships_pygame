@@ -2,7 +2,7 @@ import sys
 sys.path.append(".")
 import unittest
 
-from utils.spaceship import Spaceship
+from utils.classes.spaceship import Spaceship
 
 
 class TestSpaceship(unittest.TestCase):

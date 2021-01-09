@@ -5,7 +5,7 @@ from pygame import Surface, Rect
 
 from .bullet import Bullet
 from .spaceship import Spaceship
-from .config import ASSETS_PATH, BACKGROUND_IMAGE_FILE, WINDOW_WIDTH, WINDOW_HEIGHT
+from ..config import ASSETS_PATH, BACKGROUND_IMAGE_FILE, WINDOW_WIDTH, WINDOW_HEIGHT
 
 
 class GameContext:

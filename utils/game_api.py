@@ -2,7 +2,7 @@
 import pygame
 
 from .config import FPS
-from .game_context import GameContext
+from .classes.game_context import GameContext
 from .game_utils import (setup_display, create_spaceships, handle_event,
                          update_window, handle_movement_keys, create_barrier,
                          handle_bullets)

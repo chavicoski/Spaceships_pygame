@@ -4,8 +4,8 @@ sys.path.append(".")
 import unittest
 
 from utils.config import YELLOW
-from utils.spaceship import Spaceship
-from utils.bullet import Bullet
+from utils.classes.spaceship import Spaceship
+from utils.classes.bullet import Bullet
 
 
 class TestBullet(unittest.TestCase):
