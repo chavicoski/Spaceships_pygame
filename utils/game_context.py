@@ -22,6 +22,7 @@ class GameContext:
 
         Args:
             game_window: Surface object of the game window.
+            barrier: A Rect object that represents the middle barrier of the field.
             left_spaceship: Spaceship object from left side.
             right_spaceship: Spaceship object from right side.
             left_bullets: list with the current active bullets from left spaceship
@@ -33,7 +34,7 @@ class GameContext:
         self.right_spaceship = right_spaceship
         self.left_bullets = left_bullets
         self.right_bullets = right_bullets
-
+        # Store default background
         self.background_surface = pygame.transform.scale(
             pygame.image.load(os.path.join(
                 ASSETS_PATH, BACKGROUND_IMAGE_FILE)),

@@ -21,6 +21,7 @@ class Spaceship:
             side: str ("left" or "right") that designates the side on the field for the spaceship.
             init_pos: A tuple with the initial postition of the spaceship.
             name: The name of the spaceship.
+            health: int value with the initial health of the spaceship.
         """
         # Prepare the image for the spaceship
         spaceship_surface = pygame.image.load(

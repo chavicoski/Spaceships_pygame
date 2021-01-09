@@ -1,10 +1,6 @@
 """Module with helper internal functions for the game"""
-import os
-
 import pygame
 from pygame import Rect, Surface
-from pygame import event
-from pygame import color
 
 from .my_events import LEFT_HIT, RIGHT_HIT, WIN
 from .game_context import GameContext
@@ -64,7 +60,12 @@ def create_spaceships() -> tuple[Spaceship, Spaceship]:
     return (left_spaceship, right_spaceship)
 
 
-def restart_game(context: GameContext):
+def restart_game(context: GameContext) -> None:
+    """Restarts the game by restarting the game context with new spaceships. 
+
+    Args:
+        context: GameContext object with the context variables of the game.
+    """
     left_spaceship, right_spaceship = create_spaceships()
     context.restart(left_spaceship, right_spaceship)
 

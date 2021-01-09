@@ -61,7 +61,7 @@ LEFT_SPACESHIP_FILE = "spaceship_yellow.png"
 RIGHT_SPACESHIP_FILE = "spaceship_red.png"
 
 # METADATA
-DISPLAY_NAME = "First Game"
+DISPLAY_NAME = "Control Smasher"
 BG_COLOR = BLACK
 
 # SOUND
