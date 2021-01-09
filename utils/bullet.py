@@ -27,10 +27,22 @@ class Bullet:
         body_width, body_height = shooter.body.width, shooter.body.height
         if shooter.side == "left":
             self.body = pygame.Rect(
-                x_pos + body_width, int(y_pos + body_height/2 - bullet_height/2), bullet_width, bullet_height)
-        else:  # shooter.side must be "right"
+                x_pos + body_width,
+                int(y_pos + body_height/2 - bullet_height/2),
+                bullet_width,
+                bullet_height
+            )
+        elif shooter.side == "right":
             self.body = pygame.Rect(
-                x_pos - bullet_width, int(y_pos + body_height/2 - bullet_height/2), bullet_width, bullet_height)
+                x_pos - bullet_width,
+                int(y_pos + body_height/2 - bullet_height/2),
+                bullet_width,
+                bullet_height
+            )
+        else:
+            print(
+                f"Error! The side name \"{shooter.side}\" of the shooter \"{shooter.name}\""
+                " is not valid to create a Spaceship.")
 
     def is_hitting(self, spaceship: Spaceship) -> bool:
         """Checks if the bullet is hitting the spaceship.
