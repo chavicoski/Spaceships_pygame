@@ -3,14 +3,20 @@ import os
 
 import pygame
 from pygame import Rect, Surface
+from pygame import event
+from pygame import color
 
+from .my_events import LEFT_HIT, RIGHT_HIT, WIN
 from .game_context import GameContext
-from .config import BLACK
-from .config import (VEL, YELL_LEFT, YELL_RIGHT, YELL_UP, YELL_DOWN,
-                     RED_LEFT, RED_RIGHT, RED_UP, RED_DOWN)
-from .config import (WINDOW_WIDTH, WINDOW_HEIGHT, BARRIER_WIDTH, DISPLAY_NAME, BG_COLOR,
-                     ASSETS_PATH, YELLOW_INIT_X, YELLOW_INIT_Y, RED_INIT_X, RED_INIT_Y,
-                     YELLOW_SPACESHIP_FILE, RED_SPACESHIP_FILE, SPACESHIP_WIDTH, SPACESHIP_HEIGHT)
+from .bullet import Bullet
+from .spaceship import Spaceship
+from .config import (WHITE, WINDOW_WIDTH, WINDOW_HEIGHT, BARRIER_WIDTH, DISPLAY_NAME, BG_COLOR,
+                     LEFT_INIT_X, LEFT_INIT_Y, RIGHT_INIT_X, RIGHT_INIT_Y, BULLET_VEL,
+                     LEFT_SPACESHIP_FILE, RIGHT_SPACESHIP_FILE, MAX_ACTIVE_BULLETS, WIN_TEXT_DELAY)
+from .config import (VEL, LEFT_LEFT, LEFT_RIGHT, LEFT_UP, LEFT_DOWN, LEFT_SHOOT,
+                     RIGHT_LEFT, RIGHT_RIGHT, RIGHT_UP, RIGHT_DOWN, RIGHT_SHOOT)
+from .config import RED, YELLOW, WINNER_FONT, HP_FONT, HP_PADDING
+from .config import BULLET_HIT_SOUND, BULLET_SHOOT_SOUND
 
 
 def setup_display() -> Surface:
@@ -33,34 +39,34 @@ def create_barrier() -> Rect:
     Returns:
         A Rect object that references to the created barrier.
     """
-    return pygame.Rect(WINDOW_WIDTH/2 - BARRIER_WIDTH/2, 0, BARRIER_WIDTH, WINDOW_HEIGHT)
+    return pygame.Rect(int(WINDOW_WIDTH/2 - BARRIER_WIDTH/2), 0, BARRIER_WIDTH, WINDOW_HEIGHT)
 
 
-def create_spaceships() -> tuple[Surface, Surface, Rect, Rect]:
-    """Creates the spaceships images and rectangle objects.
+def create_spaceships() -> tuple[Spaceship, Spaceship]:
+    """Creates the spaceships objects of both sides.
 
     Returns:
-        A tuple the spaceships objects -> (yell_img, red_img, yell_rect, red_img).
+        A tuple with spaceships objects -> (left_spaceship, right_spaceship).
     """
-    # YELLOW SPACESHIP
-    yellow_spaceship_image = pygame.image.load(
-        os.path.join(ASSETS_PATH, YELLOW_SPACESHIP_FILE))
-    yellow_spaceship = pygame.transform.scale(
-        yellow_spaceship_image, (SPACESHIP_WIDTH, SPACESHIP_HEIGHT))
-    yellow_spaceship = pygame.transform.rotate(yellow_spaceship, 90)
-    yellow_rect = pygame.Rect(YELLOW_INIT_X, YELLOW_INIT_Y,
-                              SPACESHIP_HEIGHT, SPACESHIP_WIDTH)  # Invert width and height because the image is rotated
+    left_spaceship = Spaceship(
+        image_file=LEFT_SPACESHIP_FILE,
+        side="left",
+        init_pos=(LEFT_INIT_X, LEFT_INIT_Y),
+        name="Yellow"
+    )
+    right_spaceship = Spaceship(
+        image_file=RIGHT_SPACESHIP_FILE,
+        side="right",
+        init_pos=(RIGHT_INIT_X, RIGHT_INIT_Y),
+        name="Red"
+    )
 
-    # RED SPACESHIP
-    red_spaceship_image = pygame.image.load(
-        os.path.join(ASSETS_PATH, RED_SPACESHIP_FILE))
-    red_spaceship = pygame.transform.scale(
-        red_spaceship_image, (SPACESHIP_WIDTH, SPACESHIP_HEIGHT))
-    red_spaceship = pygame.transform.rotate(red_spaceship, -90)
-    red_rect = pygame.Rect(RED_INIT_X, RED_INIT_Y,
-                           SPACESHIP_HEIGHT, SPACESHIP_WIDTH)  # Invert width and height because the image is rotated
+    return (left_spaceship, right_spaceship)
 
-    return (yellow_spaceship, red_spaceship, yellow_rect, red_rect)
+
+def restart_game(context: GameContext):
+    left_spaceship, right_spaceship = create_spaceships()
+    context.restart(left_spaceship, right_spaceship)
 
 
 def update_window(context: GameContext) -> None:
@@ -69,59 +75,177 @@ def update_window(context: GameContext) -> None:
     Args:
         context: GameContext object with the context variables of the game.
     """
-    context.game_window.fill(BG_COLOR)
-    pygame.draw.rect(context.game_window, BLACK, context.barrier)
-    pygame.draw.rect(context.game_window, BLACK, context.yellow_rect)
-    pygame.draw.rect(context.game_window, BLACK, context.red_rect)
-    context.game_window.blit(context.yellow_spaceship,
-                             (context.yellow_rect.x, context.yellow_rect.y))
-    context.game_window.blit(context.red_spaceship,
-                             (context.red_rect.x, context.red_rect.y))
+    context.game_window.blit(context.background_surface, (0, 0))
+
+    # Show spaceships health
+    left_health_text = HP_FONT.render(
+        f"HP: {context.left_spaceship.health}", 1, WHITE)
+    right_health_text = HP_FONT.render(
+        f"HP: {context.right_spaceship.health}", 1, WHITE)
+    context.game_window.blit(
+        left_health_text,
+        (HP_PADDING, HP_PADDING)
+    )
+    context.game_window.blit(
+        right_health_text,
+        (context.game_window.get_width() -
+         right_health_text.get_width() - HP_PADDING, HP_PADDING)
+    )
+
+    # Draw spaceships
+    context.game_window.blit(context.left_spaceship.surface,
+                             (context.left_spaceship.body.x, context.left_spaceship.body.y))
+    context.game_window.blit(context.right_spaceship.surface,
+                             (context.right_spaceship.body.x, context.right_spaceship.body.y))
+
+    # Draw bullets
+    for bullet in context.left_bullets + context.right_bullets:
+        pygame.draw.rect(context.game_window, bullet.color, bullet.body)
+
     pygame.display.update()
 
 
-def handle_yellow_movement(context: GameContext, pressed_keys: list[bool]) -> None:
-    """Handles the movement of the yellow spaceship from the pressed keys.
+def handle_left_spaceship_movement(context: GameContext, pressed_keys: list[bool]) -> None:
+    """Handles the movement of the left side spaceship from the pressed keys.
 
     Args:
         context: GameContext object with the context variables of the game.
         pressed_keys: A pygame.key.ScancodeWraper with the info about the current pressed keys.
     """
-    yell_x, yell_y = context.yellow_rect.x, context.yellow_rect.y
-    if pressed_keys[YELL_LEFT] and yell_x - VEL > 0:
-        context.yellow_rect.x -= VEL
-    if pressed_keys[YELL_RIGHT] and yell_x + VEL + context.yellow_rect.width < context.barrier.x:
-        context.yellow_rect.x += VEL
-    if pressed_keys[YELL_UP] and yell_y - VEL > 0:
-        context.yellow_rect.y -= VEL
-    if pressed_keys[YELL_DOWN] and yell_y + VEL + context.yellow_rect.height < context.game_window.get_height():
-        context.yellow_rect.y += VEL
+    x_pos, y_pos = context.left_spaceship.body.x, context.left_spaceship.body.y
+    body_width, body_height = context.left_spaceship.body.width, context.left_spaceship.body.height
+    if pressed_keys[LEFT_LEFT] and x_pos - VEL > 0:
+        context.left_spaceship.body.x -= VEL
+    if pressed_keys[LEFT_RIGHT] and x_pos + VEL + body_width < context.barrier.x:
+        context.left_spaceship.body.x += VEL
+    if pressed_keys[LEFT_UP] and y_pos - VEL > 0:
+        context.left_spaceship.body.y -= VEL
+    if pressed_keys[LEFT_DOWN] and y_pos + VEL + body_height < context.game_window.get_height():
+        context.left_spaceship.body.y += VEL
 
 
-def handle_red_movement(context: GameContext, pressed_keys: list[bool]) -> None:
-    """Handles the movement of the red spaceship from the pressed keys.
+def handle_right_spaceship_movement(context: GameContext, pressed_keys: list[bool]) -> None:
+    """Handles the movement of the right side spaceship from the pressed keys.
 
     Args:
         context: GameContext object with the context variables of the game.
         pressed_keys: A pygame.key.ScancodeWraper with the info about the current pressed keys.
     """
-    red_x, red_y = context.red_rect.x, context.red_rect.y
-    if pressed_keys[RED_LEFT] and red_x - VEL > context.barrier.x + context.barrier.width:
-        context.red_rect.x -= VEL
-    if pressed_keys[RED_RIGHT] and red_x + VEL + context.red_rect.width < context.game_window.get_width():
-        context.red_rect.x += VEL
-    if pressed_keys[RED_UP] and red_y - VEL > 0:
-        context.red_rect.y -= VEL
-    if pressed_keys[RED_DOWN] and red_y + VEL + context.red_rect.height < context.game_window.get_height():
-        context.red_rect.y += VEL
+    x_pos, y_pos = context.right_spaceship.body.x, context.right_spaceship.body.y
+    body_width, body_height = context.right_spaceship.body.width, context.right_spaceship.body.height
+    if pressed_keys[RIGHT_LEFT] and x_pos - VEL > context.barrier.x + context.barrier.width:
+        context.right_spaceship.body.x -= VEL
+    if pressed_keys[RIGHT_RIGHT] and x_pos + VEL + body_width < context.game_window.get_width():
+        context.right_spaceship.body.x += VEL
+    if pressed_keys[RIGHT_UP] and y_pos - VEL > 0:
+        context.right_spaceship.body.y -= VEL
+    if pressed_keys[RIGHT_DOWN] and y_pos + VEL + body_height < context.game_window.get_height():
+        context.right_spaceship.body.y += VEL
 
 
-def handle_input_keys(context: GameContext) -> None:
+def handle_bullets_fired(context: GameContext, event: pygame.event.EventType) -> None:
+    """Handles the shooting action of the spaceships when they press the shoot key.
+
+    Args:
+        context: GameContext object with the context variables of the game.
+        event: An EventType object with the current event to handle.
+    """
+    if event.type == pygame.KEYDOWN:
+        if event.key == LEFT_SHOOT and len(context.left_bullets) < MAX_ACTIVE_BULLETS:
+            context.left_bullets.append(
+                Bullet(shooter=context.left_spaceship, color=YELLOW))
+            BULLET_SHOOT_SOUND.play()
+        elif event.key == RIGHT_SHOOT and len(context.right_bullets) < MAX_ACTIVE_BULLETS:
+            context.right_bullets.append(
+                Bullet(shooter=context.right_spaceship, color=RED))
+            BULLET_SHOOT_SOUND.play()
+
+
+def handle_bullet_hit(context: GameContext, event: pygame.event.EventType) -> None:
+    """Handles the damage dealt when a bullet hits an spaceship.
+
+    Args:
+        context: GameContext object with the context variables of the game.
+        event: An EventType object with the current event to handle.
+    """
+    if event.type == RIGHT_HIT:
+        context.right_spaceship.health -= event.damage
+        BULLET_HIT_SOUND.play()
+        if context.right_spaceship.is_dead():
+            pygame.event.post(pygame.event.Event(
+                WIN, winner=context.left_spaceship))
+    if event.type == LEFT_HIT:
+        context.left_spaceship.health -= event.damage
+        BULLET_HIT_SOUND.play()
+        if context.left_spaceship.is_dead():
+            pygame.event.post(pygame.event.Event(
+                WIN, winner=context.right_spaceship))
+
+
+def handle_win(context: GameContext, event: pygame.event.EventType) -> None:
+    """Handles the win event, showing the winner and restarting the game.
+
+    Args: 
+        context: GameContext object with the context variables of the game.
+        event: An EventType object with the current event to handle.
+    """
+    if event.type == WIN:
+        win_text = WINNER_FONT.render(f"{event.winner.name} wins", 1, WHITE)
+        context.game_window.blit(
+            win_text,
+            (context.game_window.get_width()//2 - win_text.get_width()//2,
+             context.game_window.get_height()//2 - win_text.get_height()//2)
+        )
+        pygame.display.update()
+        pygame.time.delay(WIN_TEXT_DELAY)  # Wait a bit in the winner screen
+        # pygame.event.post(pygame.event.Event(pygame.QUIT))
+        restart_game(context)
+
+
+def handle_event(context: GameContext, event: pygame.event.EventType) -> None:
+    """Event handler of the game.
+
+    Args:
+        context: GameContext object with the context variables of the game.
+        event: An EventType object with the current event to handle.
+    """
+    handle_win(context, event)
+    handle_bullet_hit(context, event)
+    handle_bullets_fired(context, event)
+
+
+def handle_bullets(context: GameContext) -> None:
+    """Handles the movement and collisions of the bullets.
+
+    Args:
+        context: GameContext object with the context variables of the game.
+    """
+    for bullet in context.left_bullets:
+        bullet.body.x += BULLET_VEL
+        if bullet.is_hitting(context.right_spaceship):
+            pygame.event.post(pygame.event.Event(
+                RIGHT_HIT, damage=bullet.damage))
+            context.left_bullets.remove(bullet)
+        elif bullet.body.x > context.game_window.get_width():
+            context.left_bullets.remove(bullet)
+
+    for bullet in context.right_bullets:
+        bullet.body.x -= BULLET_VEL
+        if bullet.is_hitting(context.left_spaceship):
+            pygame.event.post(pygame.event.Event(
+                LEFT_HIT, damage=bullet.damage))
+            context.right_bullets.remove(bullet)
+        elif bullet.body.x < 0:
+            context.right_bullets.remove(bullet)
+
+
+def handle_movement_keys(context: GameContext) -> None:
     """Handles the acctions to do from the current pressed keys.
 
     Args:
         context: GameContext object with the context variables of the game.
     """
     pressed_keys = pygame.key.get_pressed()
-    handle_yellow_movement(context, pressed_keys)
-    handle_red_movement(context, pressed_keys)
+
+    handle_left_spaceship_movement(context, pressed_keys)
+    handle_right_spaceship_movement(context, pressed_keys)

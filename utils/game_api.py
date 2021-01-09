@@ -2,9 +2,10 @@
 import pygame
 
 from .config import FPS
-from .game_utils import (setup_display, create_spaceships,
-                         update_window, handle_input_keys, create_barrier)
 from .game_context import GameContext
+from .game_utils import (setup_display, create_spaceships, handle_event,
+                         update_window, handle_movement_keys, create_barrier,
+                         handle_bullets)
 
 
 def setup_game() -> GameContext:
@@ -15,14 +16,12 @@ def setup_game() -> GameContext:
     """
     game_window = setup_display()
     barrier = create_barrier()
-    yellow_spaceship, red_spaceship, yellow_rect, red_rect = create_spaceships()
+    left_spaceship, right_spaceship = create_spaceships()
     context = GameContext(
         game_window=game_window,
         barrier=barrier,
-        yellow_spaceship=yellow_spaceship,
-        red_spaceship=red_spaceship,
-        yellow_rect=yellow_rect,
-        red_rect=red_rect
+        left_spaceship=left_spaceship,
+        right_spaceship=right_spaceship,
     )
 
     return context
@@ -41,7 +40,11 @@ def game_loop(context: GameContext) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            else:
+                handle_event(context, event)
 
-        handle_input_keys(context)
+        handle_bullets(context)
+
+        handle_movement_keys(context)
 
         update_window(context)
