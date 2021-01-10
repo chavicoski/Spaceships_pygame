@@ -1,4 +1,6 @@
 """Module with helper internal functions for the game"""
+from typing import Tuple, List
+
 import pygame
 from pygame import Rect, Surface
 
@@ -38,7 +40,7 @@ def create_barrier() -> Rect:
     return pygame.Rect(int(WINDOW_WIDTH / 2 - BARRIER_WIDTH / 2), 0, BARRIER_WIDTH, WINDOW_HEIGHT)
 
 
-def create_spaceships() -> tuple[Spaceship, Spaceship]:
+def create_spaceships() -> Tuple[Spaceship, Spaceship]:
     """Creates the spaceships objects of both sides.
 
     Returns:
@@ -106,7 +108,7 @@ def update_window(context: GameContext) -> None:
     pygame.display.update()
 
 
-def handle_left_spaceship_movement(context: GameContext, pressed_keys: list[bool]) -> None:
+def handle_left_spaceship_movement(context: GameContext, pressed_keys: List[bool]) -> None:
     """Handles the movement of the left side spaceship from the pressed keys.
 
     Args:
@@ -125,7 +127,7 @@ def handle_left_spaceship_movement(context: GameContext, pressed_keys: list[bool
         context.left_spaceship.body.y += VEL
 
 
-def handle_right_spaceship_movement(context: GameContext, pressed_keys: list[bool]) -> None:
+def handle_right_spaceship_movement(context: GameContext, pressed_keys: List[bool]) -> None:
     """Handles the movement of the right side spaceship from the pressed keys.
 
     Args:

@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import pygame
 
 from .spaceship import Spaceship
@@ -8,7 +10,7 @@ class Bullet:
 
     def __init__(self,
                  shooter: Spaceship,
-                 color: tuple[int, int, int],
+                 color: Tuple[int, int, int],
                  bullet_width: float = 10.0,
                  bullet_height: float = 5.0,
                  bullet_damage: int = 1):
@@ -28,14 +30,14 @@ class Bullet:
         if shooter.side == "left":
             self.body = pygame.Rect(
                 x_pos + body_width,
-                int(y_pos + body_height/2 - bullet_height/2),
+                int(y_pos + body_height / 2 - bullet_height / 2),
                 bullet_width,
                 bullet_height
             )
         elif shooter.side == "right":
             self.body = pygame.Rect(
                 x_pos - bullet_width,
-                int(y_pos + body_height/2 - bullet_height/2),
+                int(y_pos + body_height / 2 - bullet_height / 2),
                 bullet_width,
                 bullet_height
             )

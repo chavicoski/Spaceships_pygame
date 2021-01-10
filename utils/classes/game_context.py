@@ -1,4 +1,5 @@
 import os
+from typing import List
 
 import pygame
 from pygame import Surface, Rect
@@ -16,8 +17,8 @@ class GameContext:
                  barrier: Rect,
                  left_spaceship: Spaceship,
                  right_spaceship: Spaceship,
-                 left_bullets: list[Bullet] = [],
-                 right_bullets: list[Bullet] = []):
+                 left_bullets: List[Bullet] = [],
+                 right_bullets: List[Bullet] = []):
         """Context constructor.
 
         Args:

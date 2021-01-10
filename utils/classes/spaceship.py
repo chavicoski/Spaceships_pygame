@@ -1,4 +1,5 @@
 import os
+from typing import Tuple
 
 import pygame
 
@@ -11,7 +12,7 @@ class Spaceship:
     def __init__(self,
                  image_file: str,
                  side: str,
-                 init_pos: tuple[int, int],
+                 init_pos: Tuple[int, int],
                  name: str = "",
                  health: int = INIT_HEALTH):
         """Spaceship constructor.
