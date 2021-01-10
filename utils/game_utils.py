@@ -1,8 +1,9 @@
 """Module with helper internal functions for the game"""
-from typing import Tuple, List
+from typing import Tuple, Sequence
 
 import pygame
-from pygame import Rect, Surface
+from pygame import Rect
+from pygame.surface import Surface
 
 from .my_events import LEFT_HIT, RIGHT_HIT, WIN
 from .classes.game_context import GameContext
@@ -82,9 +83,9 @@ def update_window(context: GameContext) -> None:
 
     # Show spaceships health
     left_health_text = HP_FONT.render(
-        f"HP: {context.left_spaceship.health}", 1, WHITE)
+        f"HP: {context.left_spaceship.health}", True, WHITE)
     right_health_text = HP_FONT.render(
-        f"HP: {context.right_spaceship.health}", 1, WHITE)
+        f"HP: {context.right_spaceship.health}", True, WHITE)
     context.game_window.blit(
         left_health_text,
         (HP_PADDING, HP_PADDING)
@@ -108,7 +109,7 @@ def update_window(context: GameContext) -> None:
     pygame.display.update()
 
 
-def handle_left_spaceship_movement(context: GameContext, pressed_keys: List[bool]) -> None:
+def handle_left_spaceship_movement(context: GameContext, pressed_keys: Sequence[bool]) -> None:
     """Handles the movement of the left side spaceship from the pressed keys.
 
     Args:
@@ -127,7 +128,7 @@ def handle_left_spaceship_movement(context: GameContext, pressed_keys: List[bool
         context.left_spaceship.body.y += VEL
 
 
-def handle_right_spaceship_movement(context: GameContext, pressed_keys: List[bool]) -> None:
+def handle_right_spaceship_movement(context: GameContext, pressed_keys: Sequence[bool]) -> None:
     """Handles the movement of the right side spaceship from the pressed keys.
 
     Args:
@@ -146,7 +147,7 @@ def handle_right_spaceship_movement(context: GameContext, pressed_keys: List[boo
         context.right_spaceship.body.y += VEL
 
 
-def handle_bullets_fired(context: GameContext, event: pygame.event.EventType) -> None:
+def handle_bullets_fired(context: GameContext, event: pygame.event.Event) -> None:
     """Handles the shooting action of the spaceships when they press the shoot key.
 
     Args:
@@ -164,7 +165,7 @@ def handle_bullets_fired(context: GameContext, event: pygame.event.EventType) ->
             BULLET_SHOOT_SOUND.play()
 
 
-def handle_bullet_hit(context: GameContext, event: pygame.event.EventType) -> None:
+def handle_bullet_hit(context: GameContext, event: pygame.event.Event) -> None:
     """Handles the damage dealt when a bullet hits an spaceship.
 
     Args:
@@ -185,7 +186,7 @@ def handle_bullet_hit(context: GameContext, event: pygame.event.EventType) -> No
                 WIN, winner=context.right_spaceship))
 
 
-def handle_win(context: GameContext, event: pygame.event.EventType) -> None:
+def handle_win(context: GameContext, event: pygame.event.Event) -> None:
     """Handles the win event, showing the winner and restarting the game.
 
     Args: 
@@ -193,7 +194,7 @@ def handle_win(context: GameContext, event: pygame.event.EventType) -> None:
         event: An EventType object with the current event to handle.
     """
     if event.type == WIN:
-        win_text = WINNER_FONT.render(f"{event.winner.name} wins", 1, WHITE)
+        win_text = WINNER_FONT.render(f"{event.winner.name} wins", True, WHITE)
         context.game_window.blit(
             win_text,
             (context.game_window.get_width() // 2 - win_text.get_width() // 2,
@@ -201,11 +202,10 @@ def handle_win(context: GameContext, event: pygame.event.EventType) -> None:
         )
         pygame.display.update()
         pygame.time.delay(WIN_TEXT_DELAY)  # Wait a bit in the winner screen
-        # pygame.event.post(pygame.event.Event(pygame.QUIT))
         restart_game(context)
 
 
-def handle_event(context: GameContext, event: pygame.event.EventType) -> None:
+def handle_event(context: GameContext, event: pygame.event.Event) -> None:
     """Event handler of the game.
 
     Args:

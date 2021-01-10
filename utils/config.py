@@ -19,7 +19,7 @@ HP_PADDING = 10
 WINDOW_WIDTH = 900
 WINDOW_HEIGHT = 500
 
-BARRIER_WIDTH = WINDOW_WIDTH * 0.05
+BARRIER_WIDTH = int(WINDOW_WIDTH * 0.05)
 
 # Note: The object created has width and height inverted respect to the axis
 #       because the original image of the spaceships are looking downwards.

@@ -2,7 +2,8 @@ import os
 from typing import List
 
 import pygame
-from pygame import Surface, Rect
+from pygame.surface import Surface
+from pygame import Rect
 
 from .bullet import Bullet
 from .spaceship import Spaceship
