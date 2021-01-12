@@ -1,17 +1,11 @@
-import sys
-sys.path.append(".")
-
 import numpy as np
 import pygame
-from tf_agents.environments import py_environment, utils
+from tf_agents.environments import py_environment
 from tf_agents.specs import array_spec
 from tf_agents.trajectories import time_step
-from tf_agents.environments import tf_environment
-from tf_agents.environments import tf_py_environment
 
 from utils.game_utils import update_window
-from utils.classes.game_context import GameContext
-from dqn_game_api import init_game, reset_game, perform_game_action, get_game_screenshot
+from dqn.dqn_game_api import init_game, reset_game, perform_game_action, get_game_screenshot
 
 
 OBSERVATION_FRAMES = 1  # Number of consecutive frames that forms an observation
@@ -120,18 +114,3 @@ class GameEnv(py_environment.PyEnvironment):
         else:
             return time_step.transition(
                 np.array(game_frames, dtype=np.float32), reward=reward, discount=TRANSITION_DISCOUNT)
-
-
-if __name__ == "__main__":
-    env = GameEnv()
-    print('action_spec:', env.action_spec())
-    print('time_step_spec.observation:', env.time_step_spec().observation)
-    print('time_step_spec.step_type:', env.time_step_spec().step_type)
-    print('time_step_spec.discount:', env.time_step_spec().discount)
-    print('time_step_spec.reward:', env.time_step_spec().reward)
-    print("Validating env...")
-    utils.validate_py_environment(env, episodes=2)
-    print("The env is valid!")
-    print("Transforming to a TF env...")
-    tf_env = tf_py_environment.TFPyEnvironment(env)
-    print("Transformation done!")

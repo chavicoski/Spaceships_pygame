@@ -1,9 +1,10 @@
+"""API to manage the game environment for DQN."""
 from PIL import Image
 import numpy as np
 import pygame
 from tf_agents.trajectories import time_step
 
-from utils.game_utils import handle_event, handle_bullets, handle_movement_keys
+from utils.game_utils import handle_event, handle_bullets_movement
 from utils.game_utils import setup_display, update_window
 from utils.game_utils import create_barrier
 from utils.classes.game_context import GameContext
@@ -74,6 +75,6 @@ def perform_game_action(context: GameContext, action: int) -> None:
     """
     handle_action(context, action)  # Perform the action in the game
 
-    handle_bullets(context)
+    handle_bullets_movement(context)
 
     update_window(context)
