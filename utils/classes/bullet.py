@@ -2,7 +2,7 @@ from typing import Tuple
 
 import pygame
 
-from .spaceship import Spaceship
+from utils.classes.spaceship import Spaceship
 
 
 class Bullet:
@@ -32,15 +32,13 @@ class Bullet:
                 x_pos + body_width,
                 int(y_pos + body_height / 2 - bullet_height / 2),
                 bullet_width,
-                bullet_height
-            )
+                bullet_height)
         elif shooter.side == "right":
             self.body = pygame.Rect(
                 x_pos - bullet_width,
                 int(y_pos + body_height / 2 - bullet_height / 2),
                 bullet_width,
-                bullet_height
-            )
+                bullet_height)
         else:
             print(
                 f"Error! The side name \"{shooter.side}\" of the shooter \"{shooter.name}\""

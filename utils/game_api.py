@@ -1,11 +1,11 @@
 """API to setup and run the game."""
 import pygame
 
-from .config import FPS
-from .classes.game_context import GameContext
-from .game_utils import (setup_display, create_spaceships, handle_event,
-                         update_window, handle_movement_keys, create_barrier,
-                         handle_bullets)
+from utils.config import FPS
+from utils.classes.game_context import GameContext
+from utils.game_utils import create_spaceships, create_barrier
+from utils.game_utils import setup_display, update_window
+from utils.game_utils import handle_event, handle_bullets_movement, handle_keys
 
 
 def setup_game() -> GameContext:
@@ -43,8 +43,8 @@ def game_loop(context: GameContext) -> None:
             else:
                 handle_event(context, event)
 
-        handle_bullets(context)
+        handle_bullets_movement(context)
 
-        handle_movement_keys(context)
+        handle_keys(context)
 
         update_window(context)

@@ -1,25 +1,28 @@
-"""Module with helper internal functions for the game"""
+"""Module with helper functions for the game"""
 from typing import Tuple, Sequence
 
 import pygame
 from pygame import Rect
 from pygame.surface import Surface
 
-from .my_events import LEFT_HIT, RIGHT_HIT, WIN
-from .classes.game_context import GameContext
-from .classes.bullet import Bullet
-from .classes.spaceship import Spaceship
-from .config import (WHITE, WINDOW_WIDTH, WINDOW_HEIGHT, BARRIER_WIDTH, DISPLAY_NAME, BG_COLOR,
-                     LEFT_INIT_X, LEFT_INIT_Y, RIGHT_INIT_X, RIGHT_INIT_Y, BULLET_VEL,
-                     LEFT_SPACESHIP_FILE, RIGHT_SPACESHIP_FILE, MAX_ACTIVE_BULLETS, WIN_TEXT_DELAY)
-from .config import (VEL, LEFT_LEFT, LEFT_RIGHT, LEFT_UP, LEFT_DOWN, LEFT_SHOOT,
-                     RIGHT_LEFT, RIGHT_RIGHT, RIGHT_UP, RIGHT_DOWN, RIGHT_SHOOT)
-from .config import RED, YELLOW, WINNER_FONT, HP_FONT, HP_PADDING
-from .config import BULLET_HIT_SOUND, BULLET_SHOOT_SOUND
+from utils.classes.game_context import GameContext
+from utils.classes.bullet import Bullet
+from utils.classes.spaceship import Spaceship
+from utils.config import BARRIER_WIDTH
+from utils.config import LEFT_SPACESHIP_FILE, RIGHT_SPACESHIP_FILE
+from utils.config import WINDOW_WIDTH, WINDOW_HEIGHT, DISPLAY_NAME, BG_COLOR
+from utils.config import VEL, BULLET_VEL, MAX_ACTIVE_BULLETS
+from utils.config import LEFT_INIT_X, LEFT_INIT_Y, RIGHT_INIT_X, RIGHT_INIT_Y
+from utils.config import LEFT_LEFT, LEFT_RIGHT, LEFT_UP, LEFT_DOWN, LEFT_SHOOT
+from utils.config import RIGHT_LEFT, RIGHT_RIGHT, RIGHT_UP, RIGHT_DOWN, RIGHT_SHOOT
+from utils.config import WHITE, RED, YELLOW
+from utils.config import WINNER_FONT, HP_FONT, HP_PADDING, WIN_TEXT_DELAY
+from utils.config import BULLET_HIT_SOUND, BULLET_SHOOT_SOUND
+from utils.my_events import LEFT_HIT, RIGHT_HIT, WIN
 
 
 def setup_display() -> Surface:
-    """Creates the window for the game.
+    """Creates the window for the game and initializes it.
 
     Returns:
         game_window: The Surface object with the game window.
@@ -33,7 +36,9 @@ def setup_display() -> Surface:
 
 
 def create_barrier() -> Rect:
-    """Creates a barrier with a rectangle in the middle of the screen.
+    """Creates a barrier with a rectangle in the middle of the screen. This barrier
+       acts as limit for each spaceship area.
+
 
     Returns:
         A Rect object that references to the created barrier.
@@ -51,14 +56,12 @@ def create_spaceships() -> Tuple[Spaceship, Spaceship]:
         image_file=LEFT_SPACESHIP_FILE,
         side="left",
         init_pos=(LEFT_INIT_X, LEFT_INIT_Y),
-        name="Yellow"
-    )
+        name="Yellow")
     right_spaceship = Spaceship(
         image_file=RIGHT_SPACESHIP_FILE,
         side="right",
         init_pos=(RIGHT_INIT_X, RIGHT_INIT_Y),
-        name="Red"
-    )
+        name="Red")
 
     return (left_spaceship, right_spaceship)
 
@@ -88,13 +91,11 @@ def update_window(context: GameContext) -> None:
         f"HP: {context.right_spaceship.health}", True, WHITE)
     context.game_window.blit(
         left_health_text,
-        (HP_PADDING, HP_PADDING)
-    )
+        (HP_PADDING, HP_PADDING))
     context.game_window.blit(
         right_health_text,
         (context.game_window.get_width() -
-         right_health_text.get_width() - HP_PADDING, HP_PADDING)
-    )
+         right_health_text.get_width() - HP_PADDING, HP_PADDING))
 
     # Draw spaceships
     context.game_window.blit(context.left_spaceship.surface,
@@ -198,8 +199,7 @@ def handle_win(context: GameContext, event: pygame.event.Event) -> None:
         context.game_window.blit(
             win_text,
             (context.game_window.get_width() // 2 - win_text.get_width() // 2,
-             context.game_window.get_height() // 2 - win_text.get_height() // 2)
-        )
+             context.game_window.get_height() // 2 - win_text.get_height() // 2))
         pygame.display.update()
         pygame.time.delay(WIN_TEXT_DELAY)  # Wait a bit in the winner screen
         restart_game(context)
@@ -217,7 +217,7 @@ def handle_event(context: GameContext, event: pygame.event.Event) -> None:
     handle_bullets_fired(context, event)
 
 
-def handle_bullets(context: GameContext) -> None:
+def handle_bullets_movement(context: GameContext) -> None:
     """Handles the movement and collisions of the bullets.
 
     Args:
@@ -242,7 +242,7 @@ def handle_bullets(context: GameContext) -> None:
             context.right_bullets.remove(bullet)
 
 
-def handle_movement_keys(context: GameContext) -> None:
+def handle_keys(context: GameContext) -> None:
     """Handles the acctions to do from the current pressed keys.
 
     Args:

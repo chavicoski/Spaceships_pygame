@@ -1,12 +1,13 @@
-import sys
-sys.path.append(".")
 import unittest
 
 from utils.classes.spaceship import Spaceship
 
 
 class TestSpaceship(unittest.TestCase):
+    """Tests for Spaceship class"""
+
     def setUp(self):
+        """Prepares the variables for each test in this class."""
         self.name = "TestSpaceship"
         self.init_pos = (700, 250)
         self.spaceship = Spaceship(image_file="spaceship_red.png",
@@ -22,7 +23,7 @@ class TestSpaceship(unittest.TestCase):
                          msg="The y coordinate is not correct.")
 
     def test_constructor_name(self):
-        """Tests if the constructor sets correctly the name in the case that it is provided or not"""
+        """Tests if the constructor sets correctly the name in the case that it is provided or not."""
         # Check the spaceship with the name provided in the constructor
         self.assertEqual(self.name, self.spaceship.name,
                          msg=f"The name should be \"{self.name}\" but is \"{self.spaceship.name}\"")
@@ -34,7 +35,7 @@ class TestSpaceship(unittest.TestCase):
         self.assertEqual("right_spaceship", no_name_spaceship.name,
                          msg=f"The name should be \"right_spaceship\" but is \"{no_name_spaceship.name}\"")
 
-    def test_is_dead(self):
+    def test_is_dead(self) -> None:
         """Tests the dead checker function of the spacechip."""
         self.spaceship.health = 1
         self.assertFalse(self.spaceship.is_dead(),
@@ -45,7 +46,3 @@ class TestSpaceship(unittest.TestCase):
         self.spaceship.health = -2
         self.assertTrue(self.spaceship.is_dead(),
                         msg="Spaceship should be dead with negative health.")
-
-
-if __name__ == "__main__":
-    unittest.main()
